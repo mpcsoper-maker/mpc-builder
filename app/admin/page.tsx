@@ -1,9 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+type Order = {
+  id: string;
+  name?: string;
+  email?: string;
+  items?: any;
+  total_cents?: number;
+  createdAt?: string;
+};
 
 export default function AdminPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState("");
 
   async function load() {
@@ -12,39 +21,65 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/orders", { cache: "no-store" });
       const text = await res.text();
 
-      let data: any = null;
-      try {
-        data = text ? JSON.parse(text) : null;
-      } catch {
-        data = null;
-      }
-
       if (!res.ok) {
+        setError(`Server error ${res.status}: ${text || "(no body)"}`);
         setOrders([]);
-        setError(data?.error || `Server error ${res.status}: ${text.slice(0, 200)}`);
         return;
       }
 
-      setOrders(Array.isArray(data?.orders) ? data.orders : []);
+      const data = text ? JSON.parse(text) : { orders: [] };
+      setOrders(Array.isArray(data.orders) ? data.orders : []);
     } catch (e: any) {
+      setError(String(e?.message || e));
       setOrders([]);
-      setError(String(e?.message ?? e));
     }
   }
 
+  async function del(id: string) {
+    await fetch(`/api/admin/orders/${id}`, { method: "DELETE" });
+    load();
+  }
+
+  useEffect(() => {
+    load();
+  }, []);
+
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Admin Orders</h1>
+    <main style={{ padding: 24 }}>
+      <h1 style={{ fontSize: 32, fontWeight: 700 }}>Admin Orders</h1>
+      <button onClick={load} style={{ marginTop: 12, padding: "8px 12px" }}>
+        Refresh
+      </button>
 
-      <button onClick={load}>Refresh</button>
+      {error && <p style={{ color: "red", marginTop: 12 }}>{error}</p>}
 
-      {error ? <p style={{ color: "red" }}>{error}</p> : null}
-
-      {orders.length === 0 ? (
-        <p>No orders</p>
+      {!orders.length ? (
+        <p style={{ marginTop: 12 }}>No orders</p>
       ) : (
-        <pre>{JSON.stringify(orders, null, 2)}</pre>
+        <div style={{ marginTop: 16, display: "grid", gap: 12 }}>
+          {orders.map((o) => (
+            <div
+              key={o.id}
+              style={{
+                border: "1px solid #333",
+                borderRadius: 12,
+                padding: 12,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <b>{o.email || "no email"}</b>
+                <button onClick={() => del(o.id)}>Delete</button>
+              </div>
+              <div>ID: {o.id}</div>
+              {o.name && <div>Name: {o.name}</div>}
+              {o.createdAt && <div>Created: {o.createdAt}</div>}
+              <pre style={{ whiteSpace: "pre-wrap", marginTop: 8 }}>
+                {JSON.stringify(o, null, 2)}
+              </pre>
+            </div>
+          ))}
+        </div>
       )}
-    </div>
+    </main>
   );
 }
