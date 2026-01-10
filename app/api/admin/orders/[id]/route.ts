@@ -1,14 +1,23 @@
+// app/api/admin/orders/[id]/route.ts
 import { NextResponse } from "next/server";
-import { sql } from "@vercel/postgres";
+import { db } from "@/app/lib/db";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  const pass = new URL(req.url).searchParams.get("pass");
+// Next.js 16: context.params is a Promise
+type Ctx = { params: Promise<{ id: string }> };
 
-  if (pass !== "1234") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function DELETE(_req: Request, ctx: Ctx) {
+  try {
+    const { id } = await ctx.params;
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
+    db.prepare(`DELETE FROM orders WHERE id = ?`).run(id);
+
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
-
-  await sql`DELETE FROM orders WHERE id = ${params.id}`;
-
-  return NextResponse.json({ success: true });
 }
