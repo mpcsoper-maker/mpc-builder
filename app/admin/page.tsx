@@ -1,114 +1,120 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
-type Order = {
+type OrderRow = {
+  id: string;
   email: string;
-  notes: string;
-  parts: {
-    category: string;
-    name: string;
-    price: number;
-  }[];
+  parts: string; // JSON string in DB
   total: number;
+  notes: string;
   createdAt: string;
 };
 
-function euro(n: number) {
-  return new Intl.NumberFormat("de-DE", {
-    style: "currency",
-    currency: "EUR",
-  }).format(n);
-}
-
 export default function AdminPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [password, setPassword] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
+  const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!unlocked) return;
-    const raw = localStorage.getItem("mpc_orders");
-    if (raw) setOrders(JSON.parse(raw));
-  }, [unlocked]);
-
-  if (!unlocked) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-indigo-900 to-blue-700 text-white">
-        <div className="bg-white/10 backdrop-blur p-10 rounded-3xl border border-white/10 text-center">
-          <h1 className="text-3xl font-bold mb-6">Admin Access</h1>
-          <input
-            type="password"
-            placeholder="Admin password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-white/80 text-black px-4 py-3 rounded-xl outline-none"
-          />
-          <button
-            onClick={() => password === "mpc-admin" && setUnlocked(true)}
-            className="mt-4 w-full bg-purple-500 hover:bg-purple-400 transition rounded-xl py-3 font-bold text-indigo-950"
-          >
-            Unlock
-          </button>
-        </div>
-      </main>
-    );
+  async function loadOrders() {
+    setLoading(true);
+    const res = await fetch("/api/admin/orders", { cache: "no-store" });
+    const data = await res.json();
+    setOrders(Array.isArray(data.orders) ? data.orders : []);
+    setLoading(false);
   }
 
+  async function deleteOrder(id: string) {
+    // Optimistic UI: remove instantly
+    setOrders((prev) => prev.filter((o) => o.id !== id));
+
+    const res = await fetch("/api/admin/delete-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    // If failed, reload to be safe
+    if (!res.ok) {
+      await loadOrders();
+    }
+  }
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-black via-indigo-900 to-blue-700 text-white p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-extrabold">Admin Orders</h1>
-          <Link href="/" className="text-purple-300">
-            Back Home
-          </Link>
-        </div>
+    <main className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Admin Orders</h1>
 
-        {orders.length === 0 ? (
-          <div className="text-white/70">No orders yet.</div>
-        ) : (
-          <div className="space-y-6">
-            {orders.map((o, i) => (
-              <div
-                key={i}
-                className="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/10"
-              >
-                <div className="flex justify-between mb-3">
-                  <div>
-                    <div className="font-semibold">{o.email}</div>
-                    <div className="text-xs text-white/60">
-                      {new Date(o.createdAt).toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="text-xl font-bold">{euro(o.total)}</div>
-                </div>
-
-                <div className="space-y-2">
-                  {o.parts.map((p, idx) => (
-                    <div
-                      key={idx}
-                      className="flex justify-between text-sm bg-black/30 p-2 rounded-lg"
-                    >
-                      <span>
-                        {p.category} — {p.name}
-                      </span>
-                      <span>{euro(p.price)}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {o.notes && (
-                  <div className="mt-3 text-sm text-purple-200">
-                    Notes: {o.notes}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        <button
+          onClick={loadOrders}
+          className="px-4 py-2 rounded bg-black text-white"
+        >
+          Refresh
+        </button>
       </div>
+
+      {loading ? (
+        <p>Loading…</p>
+      ) : orders.length === 0 ? (
+        <p>No orders.</p>
+      ) : (
+        <div className="space-y-4">
+          {orders.map((o) => {
+            let partsParsed: any[] = [];
+            try {
+              partsParsed = JSON.parse(o.parts || "[]");
+            } catch {}
+
+            return (
+              <div
+                key={o.id}
+                className="border rounded p-4 flex items-start justify-between gap-4"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 items-center">
+                    <p className="font-semibold break-all">{o.email}</p>
+                    <span className="text-sm opacity-70">
+                      {new Date(o.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <p className="mt-2 font-bold">Total: €{Number(o.total).toFixed(2)}</p>
+
+                  {o.notes ? (
+                    <p className="mt-2 text-sm opacity-80">Notes: {o.notes}</p>
+                  ) : null}
+
+                  {partsParsed.length > 0 ? (
+                    <div className="mt-3 text-sm">
+                      <p className="font-semibold mb-1">Parts:</p>
+                      <ul className="list-disc pl-5 space-y-1">
+                        {partsParsed.map((p, idx) => (
+                          <li key={idx} className="break-words">
+                            {typeof p === "string" ? p : JSON.stringify(p)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  <p className="mt-3 text-xs opacity-60">ID: {o.id}</p>
+                </div>
+
+                <button
+                  onClick={() => deleteOrder(o.id)}
+                  title="Delete order"
+                  className="shrink-0 w-10 h-10 rounded-full border flex items-center justify-center text-red-600 font-bold hover:bg-red-50"
+                >
+                  ✕
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </main>
   );
 }
