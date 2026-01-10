@@ -1,14 +1,7 @@
-import { kv } from "@vercel/kv";
 import { NextResponse } from "next/server";
+import { readOrders } from "@/app/lib/ordersStore";
 
 export async function GET() {
-  const keys = await kv.keys("order:*");
-  const orders = [];
-
-  for (const key of keys) {
-    const order = await kv.get(key);
-    if (order) orders.push(order);
-  }
-
+  const orders = readOrders();
   return NextResponse.json({ orders });
 }
