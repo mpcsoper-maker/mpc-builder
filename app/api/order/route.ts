@@ -2,11 +2,19 @@ import { NextResponse } from "next/server";
 import { db } from "../../lib/db";
 import { randomUUID } from "crypto";
 
+
+type OrderBody = {
+  email?: string;
+  parts?: unknown[];
+  total?: number;
+  notes?: string;
+};
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = (await req.json()) as OrderBody;
 
-    if (!body.email || !body.parts?.length) {
+    if (!body.email || !Array.isArray(body.parts) || body.parts.length === 0) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
@@ -19,52 +27,14 @@ export async function POST(req: Request) {
       id,
       body.email,
       JSON.stringify(body.parts),
-      body.total,
-      body.notes || "",
+      Number(body.total ?? 0),
+      body.notes ?? "",
       new Date().toISOString()
     );
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id });
   } catch (err) {
-    console.error("ORDER ERROR:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-import { NextResponse } from "next/server";
-import { db } from "../../lib/db";
-import { randomUUID } from "crypto";
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-
-    if (!body.email || !body.parts?.length) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-    }
-
-    const id = randomUUID();
-
-    db.prepare(`
-      INSERT INTO orders (id, email, parts, total, notes, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(
-      id,
-      body.email,
-      JSON.stringify(body.parts),
-      body.total,
-      body.notes || "",
-      new Date().toISOString()
-    );
-
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error("ORDER ERROR:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error("Order POST error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
