@@ -1,14 +1,7 @@
-import Database from "better-sqlite3";
+import postgres from "postgres";
 
-export const db = new Database("orders.db");
+if (!process.env.DATABASE_URL) {
+  throw new Error("Missing DATABASE_URL");
+}
 
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS orders (
-    id TEXT PRIMARY KEY,
-    email TEXT,
-    parts TEXT,
-    total REAL,
-    notes TEXT,
-    createdAt TEXT
-  )
-`).run();
+export const sql = postgres(process.env.DATABASE_URL, { ssl: "require" });
