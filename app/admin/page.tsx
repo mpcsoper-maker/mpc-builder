@@ -9,31 +9,35 @@ export default function AdminPage() {
   async function load() {
     try {
       const res = await fetch("/api/admin/orders", { cache: "no-store" });
+
+      if (!res.ok) {
+        setError("Failed to load orders");
+        return;
+      }
+
       const data = await res.json();
-      setOrders(data);
-    } catch {
-      setError("Failed to load orders");
+      setOrders(data.orders || []);
+    } catch (err) {
+      setError("Server error");
     }
   }
 
-  async function remove(id: string) {
-    await fetch(`/api/admin/orders/${id}`, { method: "DELETE" });
+  useEffect(() => {
     load();
-  }
-
-  useEffect(() => { load(); }, []);
+  }, []);
 
   return (
-    <div style={{ padding: 40 }}>
+    <div style={{ padding: 30 }}>
       <h1>Admin Orders</h1>
       <button onClick={load}>Refresh</button>
-      <p style={{ color: "red" }}>{error}</p>
 
-      {orders.map(o => (
-        <div key={o.id} style={{ border: "1px solid #444", marginTop: 10, padding: 10 }}>
-          <b>{o.name}</b> – {o.email}<br/>
-          Total: €{o.total}
-          <button onClick={() => remove(o.id)} style={{ marginLeft: 10 }}>❌</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {orders.length === 0 && <p>No orders yet.</p>}
+
+      {orders.map((o, i) => (
+        <div key={i} style={{ border: "1px solid gray", padding: 10, margin: 10 }}>
+          <pre>{JSON.stringify(o, null, 2)}</pre>
         </div>
       ))}
     </div>

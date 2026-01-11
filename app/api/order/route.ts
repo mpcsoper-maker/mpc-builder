@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
-import { readOrders, writeOrders } from "@/app/lib/ordersStore";
-import { randomUUID } from "crypto";
+import { kv } from "@/app/lib/kv";
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  const order = await req.json();
+  const id = crypto.randomUUID();
 
-  const orders = readOrders();
-  orders.unshift({
-    id: randomUUID(),
-    ...body,
-    createdAt: new Date().toISOString(),
-  });
+  await kv.set(`order:${id}`, { id, ...order });
+  await kv.lpush("orders", id);
 
-  writeOrders(orders);
   return NextResponse.json({ success: true });
 }

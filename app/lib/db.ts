@@ -1,7 +1,3 @@
-import postgres from "postgres";
-
-if (!process.env.DATABASE_URL) {
-  throw new Error("Missing DATABASE_URL");
-}
-
-export const sql = postgres(process.env.DATABASE_URL, { ssl: "require" });
+// app/lib/db.ts
+import { sql } from "@vercel/postgres";
+export { sql };
