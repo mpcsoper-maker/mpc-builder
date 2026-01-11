@@ -10,6 +10,7 @@
     "db:init": "node --loader ts-node/esm scripts/init-db.ts"
   },
   "dependencies": {
+    "@upstash/redis": "^1.36.1",
     "@vercel/kv": "^3.0.0",
     "@vercel/postgres": "^0.10.0",
     "next": "16.1.1",
