@@ -6,7 +6,8 @@ export type PartCategory =
   | "ssd"
   | "psu"
   | "case"
-  | "cooler";
+  | "cooler"
+    "HHD";
 
 export type Part = {
   id: string;
@@ -100,5 +101,11 @@ export const parts: Record<PartCategory, Part[]> = {
     { id: "h100i", name: "Corsair H100i 240mm AIO", price: 119 },
     { id: "arctic280", name: "Arctic Liquid Freezer II 280", price: 129 },
     { id: "kraken360", name: "NZXT Kraken 360mm AIO", price: 179 },
+  ],
+
+  HHD: [
+  { id: "hdd1", name: "HHD 500 GB", price: 30},
+  { id: "hdd2", name: "HHD 1 TB", price: 50},
+  { id: "hdd3", name: "HHD 2 TB", price: 70},
   ],
 };

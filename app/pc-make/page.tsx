@@ -14,6 +14,7 @@ const categoryLabels: Record<PartCategory, string> = {
   psu: "Power Supply",
   case: "Case",
   cooler: "Cooler",
+  HHD: "HHD",
 };
 
 const categories: PartCategory[] = [
@@ -25,6 +26,7 @@ const categories: PartCategory[] = [
   "psu",
   "case",
   "cooler",
+  "HHD",
 ];
 
 function euro(n: number) {
@@ -160,7 +162,7 @@ export default function PcMakePage() {
           <h1 className="text-4xl font-extrabold text-gray-100">
             make your own pc
           </h1>
-          <p className="text-gray-200/80 mt-2">Prices can be fales.</p>
+          <p className="text-gray-200/80 mt-2">Prices can be false.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-12">

@@ -32,7 +32,7 @@ export default function Home() {
             build your dream pc
           </h1>
           <p className="text-white/75 mt-3 text-lg">
-            Choose parts, see the total price, and get advice.
+            
           </p>
         </div>
 
@@ -46,7 +46,7 @@ export default function Home() {
           </a>
 
           <a
-            href="/pre-builds"
+            href="/prebuilts"
             className="w-full max-w-xl bg-white/10 hover:bg-white/15 transition px-10 py-6 rounded-3xl text-2xl md:text-3xl font-semibold text-white border border-white/15 backdrop-blur-xl shadow-lg active:scale-[0.99]"
           >
             pre-build’s
@@ -54,9 +54,6 @@ export default function Home() {
         </div>
 
         {/* little footer text */}
-        <div className="text-center mt-10 text-sm text-white/60">
-          New stock drops soon • Germany/EU builds
-        </div>
         <div className="text-center mt-10 text-sm text-white/60">
           FREE SHIPPING IN GERMANY 
         </div>

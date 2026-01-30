@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type BuildItem = {
   category: string;
@@ -16,6 +17,13 @@ type StoredBuild = {
   total: number;
 };
 
+type StoredRequest = {
+  orderNumber: string;
+  createdAt: string;
+  parts: BuildItem[];
+  total: number;
+};
+
 function euro(n: number) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -23,12 +31,15 @@ function euro(n: number) {
   }).format(n);
 }
 
+function makeOrderNumber() {
+  const num = Math.floor(10000 + Math.random() * 90000); // 5 digits
+  return `MPCS-${num}`;
+}
+
 export default function CheckoutPage() {
+  const router = useRouter();
   const [build, setBuild] = useState<StoredBuild | null>(null);
-  const [email, setEmail] = useState("");
-  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -44,34 +55,35 @@ export default function CheckoutPage() {
 
   const total = useMemo(() => build?.total ?? 0, [build]);
 
-  function submitBuild() {
+  function continueToContact() {
     try {
       setError("");
-      setSuccess(false);
       setLoading(true);
 
       if (!build?.parts?.length) {
         throw new Error("No build found. Go back and select parts first.");
       }
 
-      if (!email.includes("@")) {
-        throw new Error("Please enter a valid email.");
-      }
-
-      const orders = JSON.parse(localStorage.getItem("mpc_orders") || "[]");
-
-      orders.push({
-        email,
-        notes,
+      const req: StoredRequest = {
+        orderNumber: makeOrderNumber(),
+        createdAt: new Date().toISOString(),
         parts: build.parts,
         total: build.total,
-        createdAt: new Date().toISOString(),
-      });
+      };
 
-      localStorage.setItem("mpc_orders", JSON.stringify(orders));
-      localStorage.removeItem("mpc_checkout_build");
+      // Save the latest request for the next page
+      localStorage.setItem("mpc_last_request", JSON.stringify(req));
 
-      setSuccess(true);
+      // Optional: keep a local history (same device only)
+      const history = JSON.parse(localStorage.getItem("mpc_requests") || "[]");
+      history.unshift(req);
+      localStorage.setItem("mpc_requests", JSON.stringify(history));
+
+      // (Optional) Clear builder checkout cache so they don't re-submit by accident
+      // If you prefer keeping it, comment this out:
+      // localStorage.removeItem("mpc_checkout_build");
+
+      router.push("/contact");
     } catch (err: any) {
       setError(err?.message || "Something went wrong");
     } finally {
@@ -92,7 +104,7 @@ export default function CheckoutPage() {
         <div className="text-center mt-6">
           <h1 className="text-5xl font-extrabold">Checkout</h1>
           <p className="text-white/70 mt-2">
-            We’ll review your build, confirm part availability, and contact you with updates.
+            Review your build, then continue to contact us on WhatsApp/Discord.
           </p>
         </div>
 
@@ -108,7 +120,7 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 {build.parts.map((p) => (
                   <div
-                    key={p.category}
+                    key={`${p.category}-${p.id}`}
                     className="bg-black/25 rounded-2xl p-4 border border-white/10 flex items-start justify-between gap-3"
                   >
                     <div>
@@ -128,43 +140,23 @@ export default function CheckoutPage() {
           </div>
 
           <div className="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/10">
-            <h2 className="text-2xl font-bold mb-4">Contact</h2>
-
-            <label className="text-sm text-white/80">Your email</label>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@email.com"
-              className="mt-2 w-full bg-white/85 text-black rounded-2xl px-4 py-3 outline-none"
-            />
-
-            <label className="text-sm text-white/80 mt-5 block">
-              Notes (optional)
-            </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any preferences? (RGB, quiet build, budget limit, etc.)"
-              className="mt-2 w-full bg-white/85 text-black rounded-2xl px-4 py-3 outline-none min-h-[120px]"
-            />
+            <h2 className="text-2xl font-bold mb-2">Next step</h2>
+            <p className="text-white/70">
+              When you continue, you’ll get a build code + download file to send
+              us on WhatsApp/Discord.
+            </p>
 
             <button
-              onClick={submitBuild}
+              onClick={continueToContact}
               disabled={loading || !build?.parts?.length}
               className="mt-6 w-full bg-purple-500 hover:bg-purple-400 disabled:opacity-60 transition rounded-2xl py-4 text-xl font-bold text-indigo-950"
             >
-              {loading ? "Sending..." : "Submit build request"}
+              {loading ? "Loading..." : "Continue to Contact"}
             </button>
 
             {error && (
               <div className="mt-3 text-sm bg-red-500/20 border border-red-300/30 rounded-xl p-3">
                 {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="mt-3 text-sm bg-green-500/20 border border-green-300/30 rounded-xl p-3">
-                Sent ✅ Your build was saved. Open /admin to review orders.
               </div>
             )}
           </div>
