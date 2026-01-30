@@ -11,10 +11,10 @@ const categoryLabels: Record<PartCategory, string> = {
   motherboard: "Motherboard",
   ram: "RAM",
   ssd: "SSD",
+  hdd: "HDD",
   psu: "Power Supply",
   case: "Case",
   cooler: "Cooler",
-  HHD: "HHD",
 };
 
 const categories: PartCategory[] = [
@@ -23,10 +23,10 @@ const categories: PartCategory[] = [
   "motherboard",
   "ram",
   "ssd",
+  "hdd",
   "psu",
   "case",
   "cooler",
-  "HHD",
 ];
 
 function euro(n: number) {
