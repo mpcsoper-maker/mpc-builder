@@ -4,10 +4,10 @@ export type PartCategory =
   | "motherboard"
   | "ram"
   | "ssd"
+  | "hdd"
   | "psu"
   | "case"
-  | "cooler"
-    "HHD";
+  | "cooler";
 
 export type Part = {
   id: string;
@@ -16,7 +16,6 @@ export type Part = {
 };
 
 export const parts: Record<PartCategory, Part[]> = {
-
   cpu: [
     { id: "r5-5600", name: "AMD Ryzen 5 5600", price: 109 },
     { id: "r5-5600x", name: "AMD Ryzen 5 5600X", price: 129 },
@@ -80,6 +79,12 @@ export const parts: Record<PartCategory, Part[]> = {
     { id: "s990pro-4tb", name: "Samsung 990 PRO 4TB NVMe", price: 369 },
   ],
 
+  hdd: [
+    { id: "hdd1", name: "HDD 500 GB", price: 30 },
+    { id: "hdd2", name: "HDD 1 TB", price: 50 },
+    { id: "hdd3", name: "HDD 2 TB", price: 70 },
+  ],
+
   psu: [
     { id: "rm650", name: "Corsair RM650 650W Gold", price: 89 },
     { id: "rm750", name: "Corsair RM750 750W Gold", price: 109 },
@@ -101,11 +106,5 @@ export const parts: Record<PartCategory, Part[]> = {
     { id: "h100i", name: "Corsair H100i 240mm AIO", price: 119 },
     { id: "arctic280", name: "Arctic Liquid Freezer II 280", price: 129 },
     { id: "kraken360", name: "NZXT Kraken 360mm AIO", price: 179 },
-  ],
-
-  HHD: [
-  { id: "hdd1", name: "HHD 500 GB", price: 30},
-  { id: "hdd2", name: "HHD 1 TB", price: 50},
-  { id: "hdd3", name: "HHD 2 TB", price: 70},
   ],
 };
