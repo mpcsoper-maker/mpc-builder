@@ -33,7 +33,7 @@ export const PREBUILTS: Prebuilt[] = [
   {
     slug: "xxx-2",
     name: "Mpcs gaming pc",
-    price: 1485,
+    price: 1358,
     discount: 20,
     image: null,
     parts: [
