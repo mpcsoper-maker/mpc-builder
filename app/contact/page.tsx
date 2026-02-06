@@ -26,7 +26,7 @@ function euro(n: number) {
   }).format(n);
 }
 
-const WHATSAPP_NUMBER = "1603357458"; // no +
+const WHATSAPP_NUMBER = "491603357458"; // no +
 const DISCORD_INVITE = "https://discord.gg/2K2tzrYrn5";
 const TELEGRAM_USERNAME = "mpcs_support"; // without @
 
