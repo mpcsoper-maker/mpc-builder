@@ -27,7 +27,7 @@ export const PREBUILTS: Prebuilt[] = [
       { category: "Storage", name: "Lexar NQ790 SSD 1TB M.2 2280 PCIe Gen4 NVMe", price: 124,},
       { category: "Motherboard", name: "ASRock B650M-H/M.2+ Mainboard", price: 80 },
       { category: "PSU", name: "be quiet! SYSTEM POWER 11 750W | PC-Netzteil", price: 72 },
-      { category: "Case", name: "case", price: 75 },
+      { category: "Case", name: "ASUS Prime AP201 TG | MicroATX PC-Gehäuse", price: 75 },
       { category: "m-pcs-cut", name: "m-pcs-cut", price: 7 },
       { category: "ship", name: "shiping to ireland", price: 26 },
     ],
