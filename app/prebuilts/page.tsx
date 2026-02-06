@@ -1,5 +1,6 @@
 // 1) app/prebuilts/page.tsx
 import Link from "next/link";
+import Image from "next/image";
 import { PREBUILTS } from "../lib/prebuilts";
 
 function euro(n: number) {
@@ -40,7 +41,16 @@ export default function PrebuiltsPage() {
                 className="bg-white/10 backdrop-blur rounded-3xl p-5 border border-white/10 hover:bg-white/15 transition block"
               >
                 <div className="bg-black/25 rounded-2xl border border-white/10 h-44 flex items-center justify-center text-white/60 relative overflow-hidden">
-                  No image available
+                  {b.image ? (
+                    <Image
+                      src={b.image}
+                      alt={b.name}
+                      fill
+                      className="object-contain"
+                    />
+                  ) : (
+                    <span>No image available</span>
+                  )}
 
                   {hasDiscount && (
                     <div className="absolute top-3 right-3 bg-green-400 text-black font-extrabold text-xs px-3 py-1 rounded-full">

@@ -1,5 +1,6 @@
-// 2) app/prebuilts/[slug]/page.tsx
+// app/prebuilts/[slug]/page.tsx
 import Link from "next/link";
+import Image from "next/image";
 import { PREBUILTS } from "../../lib/prebuilts";
 import ContinueToContactButton from "./ContinueToContactButton";
 
@@ -53,7 +54,16 @@ export default async function PrebuiltDetailsPage(props: PageProps) {
           {/* Left: image + title + price + continue */}
           <div className="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/10">
             <div className="bg-black/25 rounded-2xl border border-white/10 h-64 flex items-center justify-center text-white/60 relative overflow-hidden">
-              No image available
+              {prebuilt.image ? (
+                <Image
+                  src={prebuilt.image}
+                  alt={prebuilt.name}
+                  fill
+                  className="object-contain"
+                />
+              ) : (
+                <span>No image available</span>
+              )}
 
               {hasDiscount && (
                 <div className="absolute top-3 right-3 bg-green-400 text-black font-extrabold text-xs px-3 py-1 rounded-full">

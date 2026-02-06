@@ -19,7 +19,7 @@ export const PREBUILTS: Prebuilt[] = [
     name: "m-pcs",
     price: 1569,
     discount: 0,
-    image: null,
+    image: "/Screenshot 2026-02-06 233701.png",
     parts: [
       { category: "CPU", name: "Ryzen 5 7600", price: 165 },
       { category: "GPU", name: " MSI GeForce RTX 5070 12G", price: 647 },
