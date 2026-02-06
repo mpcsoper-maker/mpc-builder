@@ -16,8 +16,8 @@ export type Prebuilt = {
 export const PREBUILTS: Prebuilt[] = [
   {
     slug: "",
-    name: "out of stock",
-    price: 0,
+    name: "m-pcs",
+    price: 1762,
     discount: 0,
     image: null,
     parts: [
@@ -26,7 +26,7 @@ export const PREBUILTS: Prebuilt[] = [
       { category: "RAM", name: "Crucial Pro OC Schwarz 32GB Kit (2x16GB) DDR5-6000 CL36", price: 399 },
       { category: "Storage", name: "1 tb 990 pro", price: 299,},
       { category: "Motherboard", name: "msi B605 tomahawk", price: 180 },
-      { category: "PSU", name: "mpcs 7502", price: 0 },
+      { category: "PSU", name: "mpcs 750w", price: 0 },
       { category: "Case", name: "m-pcs case", price: 0 },
     ],
   },
