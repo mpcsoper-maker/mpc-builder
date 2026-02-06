@@ -20,27 +20,19 @@ type StoredRequest = {
 };
 
 function euro(n: number) {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(n);
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(n);
 }
 
-const WHATSAPP_NUMBER = "49XXXXXXXXXXX"; // TODO: set yours (example 4917612345678)
+const WHATSAPP_NUMBER = "1603357458"; // no +
 const DISCORD_INVITE = "https://discord.gg/2K2tzrYrn5";
-
-function downloadTextFile(filename: string, content: string) {
-  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
+const TELEGRAM_USERNAME = "mpcs_support"; // without @
 
 export default function ContactPage() {
   const [req, setReq] = useState<StoredRequest | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"none" | "build" | "discord">("none");
 
   useEffect(() => {
     const raw = localStorage.getItem("mpc_last_request");
@@ -52,23 +44,18 @@ export default function ContactPage() {
     }
   }, []);
 
-  const whatsappLink = useMemo(() => {
-    if (!req) return `https://wa.me/${WHATSAPP_NUMBER}`;
-    const text = encodeURIComponent(
-      `Hi M-PCs! My Build Code is ${req.orderNumber}. I’m sending my build file now.`
-    );
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-  }, [req]);
-
-  const buildFile = useMemo(() => {
+  /** FULL BUILD TEXT */
+  const buildMessage = useMemo(() => {
     if (!req) return "";
 
     const lines: string[] = [];
-    lines.push("M-PCs Build Request");
-    lines.push("-------------------");
+    lines.push("Hi M-PCs 👋");
+    lines.push("");
     lines.push(`Build Code: ${req.orderNumber}`);
     if (req.title) lines.push(`Build: ${req.title}`);
-    lines.push(`Created: ${new Date(req.createdAt).toLocaleString("de-DE")}`);
+    lines.push(
+      `Created: ${new Date(req.createdAt).toLocaleString("de-DE")}`
+    );
     lines.push("");
     lines.push("Parts:");
     for (const p of req.parts) {
@@ -77,16 +64,37 @@ export default function ContactPage() {
     lines.push("");
     lines.push(`Total: ${euro(req.total)}`);
     lines.push("");
-    lines.push("Send this file + your Build Code to M-PCs on WhatsApp/Discord.");
+    lines.push("Please confirm availability and final price. Thanks!");
+
     return lines.join("\n");
   }, [req]);
 
-  async function copyCode() {
-    if (!req?.orderNumber) return;
+  const whatsappLink = useMemo(() => {
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+      buildMessage
+    )}`;
+  }, [buildMessage]);
+
+  const telegramLink = useMemo(() => {
+    return `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(
+      buildMessage
+    )}`;
+  }, [buildMessage]);
+
+  async function copyBuild() {
     try {
-      await navigator.clipboard.writeText(req.orderNumber);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1200);
+      await navigator.clipboard.writeText(buildMessage);
+      setCopied("build");
+      setTimeout(() => setCopied("none"), 1500);
+    } catch {}
+  }
+
+  async function sendToDiscord() {
+    try {
+      await navigator.clipboard.writeText(buildMessage);
+      setCopied("discord");
+      setTimeout(() => setCopied("none"), 1500);
+      window.open(DISCORD_INVITE, "_blank");
     } catch {}
   }
 
@@ -103,7 +111,7 @@ export default function ContactPage() {
         <div className="text-center mt-6">
           <h1 className="text-5xl font-extrabold">Contact</h1>
           <p className="text-white/70 mt-2">
-            Download your build file and send it to us on WhatsApp/Discord.
+            
           </p>
         </div>
 
@@ -113,56 +121,52 @@ export default function ContactPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12">
+            {/* LEFT */}
             <div className="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/10">
-              <h2 className="text-2xl font-bold mb-4">Your build code</h2>
-
-              <div className="bg-black/25 rounded-2xl p-4 border border-white/10 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-white/70 text-sm">Build Code</div>
-                  <div className="text-3xl font-extrabold">{req.orderNumber}</div>
-                  <div className="text-white/60 text-xs mt-1">
-                    Remember this code — we’ll ask for it.
-                  </div>
-                </div>
-
-                <button
-                  onClick={copyCode}
-                  className="bg-white/85 text-black hover:bg-white transition rounded-2xl px-4 py-3 font-bold"
-                >
-                  {copied ? "Copied ✅" : "Copy"}
-                </button>
-              </div>
-
-              <button
-                onClick={() => downloadTextFile(`${req.orderNumber}.txt`, buildFile)}
-                className="mt-6 w-full bg-purple-500 hover:bg-purple-400 transition rounded-2xl py-4 text-xl font-bold text-indigo-950"
-              >
-                Download build file
-              </button>
+              <h2 className="text-2xl font-bold mb-4"></h2>
 
               <a
                 href={whatsappLink}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 block w-full text-center bg-white/85 text-black hover:bg-white transition rounded-2xl py-4 text-xl font-bold"
+                className="block w-full text-center bg-green-500 hover:bg-green-400 transition rounded-2xl py-4 text-xl font-bold text-black"
               >
-                Contact us on WhatsApp
+                Send via WhatsApp
               </a>
 
               <a
-                href={DISCORD_INVITE}
+                href={telegramLink}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 block w-full text-center bg-white/10 border border-white/20 hover:bg-white/15 transition rounded-2xl py-4 text-xl font-bold"
+                className="mt-3 block w-full text-center bg-sky-400 hover:bg-sky-300 transition rounded-2xl py-4 text-xl font-bold text-black"
               >
-                Contact us on Discord
+                Send via Telegram
               </a>
 
+              <button
+                onClick={sendToDiscord}
+                className="mt-3 w-full bg-indigo-500 hover:bg-indigo-400 transition rounded-2xl py-4 text-xl font-bold"
+              >
+                {copied === "discord"
+                  ? "Copied! Paste in Discord ✅"
+                  : "Send via Discord"}
+              </button>
+
+              <button
+                onClick={copyBuild}
+                className="mt-3 w-full bg-white/85 text-black hover:bg-white transition rounded-2xl py-4 text-xl font-bold"
+              >
+                {copied === "build"
+                  ? "Build copied ✅"
+                  : "Copy build to clipboard"}
+              </button>
+
               <div className="text-white/70 text-sm mt-3">
-                Send the downloaded file + your build code to us. We’ll confirm availability and final price in chat.
+                for discord you need to copy.
               </div>
             </div>
 
+            {/* RIGHT */}
             <div className="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/10">
               <h2 className="text-2xl font-bold mb-4">Your build</h2>
 
@@ -182,7 +186,9 @@ export default function ContactPage() {
 
                 <div className="bg-black/25 rounded-2xl p-4 border border-white/10 flex items-center justify-between mt-4">
                   <div className="font-bold">Total</div>
-                  <div className="text-2xl font-extrabold">{euro(req.total)}</div>
+                  <div className="text-2xl font-extrabold">
+                    {euro(req.total)}
+                  </div>
                 </div>
               </div>
             </div>
