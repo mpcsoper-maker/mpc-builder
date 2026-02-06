@@ -15,7 +15,7 @@ export type Prebuilt = {
 
 export const PREBUILTS: Prebuilt[] = [
   {
-    slug: "",
+    slug: "xx-1",
     name: "m-pcs",
     price: 1762,
     discount: 0,
