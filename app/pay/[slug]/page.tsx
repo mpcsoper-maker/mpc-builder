@@ -103,7 +103,7 @@ export default async function PayPage({
                 rel="noreferrer"
                 className="mt-5 block w-full rounded-xl bg-[#0070BA] px-4 py-3 text-center font-semibold text-white transition hover:bg-[#005EA6]"
               >
-                Pay with PayPal →
+                Pay →
               </a>
 
               <p className="mt-4 text-center text-xs text-zinc-500">
