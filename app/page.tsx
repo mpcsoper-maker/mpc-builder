@@ -1,173 +1,262 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function Welcome() {
-  const router = useRouter();
-  const [leaving, setLeaving] = useState(false);
-
-  // Review bar: show once on load, then hide forever (until refresh)
-  const [showReview, setShowReview] = useState(true);
-
-  const exitMs = 520;
-
-  // timings for review popup
-  const popInMs = 450;     // animation time
-  const visibleMs = 3200;  // how long it stays visible before hiding
+export default function MaintenancePage() {
+  const [elapsed, setElapsed] = useState(0); // seconds since down
 
   useEffect(() => {
-    // show on first render, hide after visibleMs
-    const t = window.setTimeout(() => setShowReview(false), visibleMs);
-    return () => window.clearTimeout(t);
+    const interval = setInterval(() => {
+      setElapsed((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  const onContinue = () => {
-    if (leaving) return;
-    setLeaving(true);
-    setShowReview(false); // hide immediately when leaving
-    window.setTimeout(() => router.push("/home"), exitMs);
-  };
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const hours = Math.floor(elapsed / 3600);
+  const mins  = Math.floor((elapsed % 3600) / 60);
+  const secs  = elapsed % 60;
 
-  const logoClass = useMemo(() => {
-    return (
-      "absolute top-3 left-3 text-purple-400 font-extrabold " +
-      "text-[5rem] sm:text-[6.5rem] leading-[0.6] tracking-tighter " +
-      "transition-all duration-700 ease-out " +
-      (leaving
-        ? "opacity-0 -translate-y-2 blur-[2px]"
-        : "opacity-100 translate-y-0")
-    );
-  }, [leaving]);
+
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-indigo-900 to-blue-700 text-white relative overflow-hidden">
-      {/* soft background glow */}
-      <div
-        className={
-          "pointer-events-none absolute -top-40 -right-40 h-[520px] w-[520px] rounded-full " +
-          "bg-purple-500/20 blur-[80px] " +
-          "transition-all duration-700 ease-out " +
-          (leaving ? "opacity-0 scale-95" : "opacity-100 scale-100")
-        }
-      />
-      <div
-        className={
-          "pointer-events-none absolute -bottom-48 -left-48 h-[520px] w-[520px] rounded-full " +
-          "bg-blue-400/20 blur-[90px] " +
-          "transition-all duration-700 ease-out " +
-          (leaving ? "opacity-0 scale-95" : "opacity-100 scale-100")
-        }
-      />
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #000 0%, #1e1b4b 55%, #1d4ed8 100%)",
+        fontFamily: "'DM Sans', sans-serif",
+        color: "#f3f4f6",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-      {/* LOGO */}
-      <div className={logoClass}>
-        M-
-        <br />
-        pc’s
-        <div className="h-2 w-32 sm:w-40 bg-purple-400 mt-2" />
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @keyframes breathe {
+          from { opacity: 0.7; transform: scale(1); }
+          to   { opacity: 1;   transform: scale(1.08); }
+        }
+        @keyframes fadeSlideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(14px) scale(0.99); filter: blur(3px); }
+          to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
+        }
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%       { opacity: 0.5; transform: scale(0.75); }
+        }
+        @keyframes wobble {
+          0%, 100% { transform: rotate(-4deg); }
+          50%       { transform: rotate(4deg); }
+        }
+        @keyframes blink {
+          50% { opacity: 0; }
+        }
+
+        .glow-tr {
+          pointer-events: none;
+          position: absolute;
+          top: -10rem; right: -10rem;
+          width: 480px; height: 480px;
+          border-radius: 50%;
+          background: rgba(168,85,247,0.22);
+          filter: blur(80px);
+          animation: breathe 6s ease-in-out infinite alternate;
+        }
+        .glow-bl {
+          pointer-events: none;
+          position: absolute;
+          bottom: -12rem; left: -12rem;
+          width: 500px; height: 500px;
+          border-radius: 50%;
+          background: rgba(96,165,250,0.18);
+          filter: blur(90px);
+          animation: breathe 6s ease-in-out infinite alternate;
+          animation-delay: 2s;
+        }
+        .logo {
+          position: absolute;
+          top: 0.75rem; left: 0.85rem;
+          font-family: 'Syne', sans-serif;
+          font-weight: 800;
+          font-size: clamp(4rem, 10vw, 6.5rem);
+          line-height: 0.6;
+          letter-spacing: -0.04em;
+          color: #c084fc;
+          animation: fadeSlideDown 0.7s ease-out forwards;
+          z-index: 10;
+        }
+        .logo-bar {
+          height: 6px;
+          width: clamp(7rem, 18vw, 10rem);
+          background: #c084fc;
+          margin-top: 0.5rem;
+          border-radius: 2px;
+        }
+        .card {
+          position: relative;
+          z-index: 5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          max-width: 480px;
+          width: calc(100% - 2rem);
+          padding: 2.8rem 2.2rem 2.4rem;
+          border-radius: 28px;
+          border: 1px solid rgba(255,255,255,0.13);
+          background: rgba(0,0,0,0.28);
+          backdrop-filter: blur(18px);
+          animation: fadeUp 0.75s ease-out both;
+          box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+        }
+        .status-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.35rem 1rem;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.13);
+          background: rgba(0,0,0,0.35);
+          backdrop-filter: blur(10px);
+          font-size: 0.78rem;
+          color: rgba(255,255,255,0.55);
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          margin-bottom: 1.6rem;
+        }
+        .dot {
+          width: 7px; height: 7px;
+          border-radius: 50%;
+          background: #f87171;
+          box-shadow: 0 0 8px #f87171;
+          animation: pulse-dot 1.4s ease-in-out infinite;
+        }
+        .icon-wrap {
+          width: 64px; height: 64px;
+          border-radius: 18px;
+          background: rgba(168,85,247,0.18);
+          border: 1px solid rgba(192,132,252,0.25);
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 1.4rem;
+          font-size: 2rem;
+          animation: wobble 3s ease-in-out infinite;
+        }
+        .time-block { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+        .time-num {
+          font-family: 'Syne', sans-serif;
+          font-weight: 800;
+          font-size: clamp(1.8rem, 6vw, 2.6rem);
+          color: #f3f4f6;
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.13);
+          border-radius: 12px;
+          width: clamp(60px, 16vw, 76px);
+          height: clamp(60px, 16vw, 76px);
+          display: flex; align-items: center; justify-content: center;
+        }
+        .time-label {
+          font-size: 0.65rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.55);
+        }
+        .sep {
+          font-family: 'Syne', sans-serif;
+          font-size: 2rem;
+          font-weight: 800;
+          color: #c084fc;
+          align-self: flex-start;
+          margin-top: 0.8rem;
+          animation: blink 1s step-start infinite;
+        }
+
+
+        .uptime-label {
+          font-size: 0.72rem;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.4);
+          margin-bottom: 0.6rem;
+        }
+      `}</style>
+
+      <div className="glow-tr" />
+      <div className="glow-bl" />
+
+      {/* Logo */}
+      <div className="logo">
+        M-<br />pc&apos;s
+        <div className="logo-bar" />
       </div>
 
-      {/* TOP REVIEW BAR: pops down then goes back up once */}
-      <div
-        className={[
-          "absolute top-4 left-1/2 -translate-x-1/2 z-20",
-          "w-[calc(100%-1.25rem)] max-w-[720px]",
-          "px-3 py-2 rounded-2xl",
-          "bg-black/35 border border-white/15",
-          "backdrop-blur-sm",
-          "will-change-transform",
-          "transition-all",
-          `duration-[${popInMs}ms]`,
-          leaving
-            ? "opacity-0 -translate-y-3 pointer-events-none"
-            : showReview
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-6 pointer-events-none",
-        ].join(" ")}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-1 sm:gap-2 text-[12px] sm:text-sm text-white/90 leading-snug">
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-yellow-400 tracking-tight">★★★★☆</span>
-            <span className="font-medium">4.5</span>
-            <span className="text-white/60">/ 5</span>
-          </div>
-
-          <span className="hidden sm:inline text-white/40">•</span>
-
-          <div className="text-center sm:text-left text-white/80 break-words">
-            <span className="font-medium text-white/90">Lucko</span>
-            <span className="text-white/60"> — </span>
-            <span className="whitespace-nowrap">€1,599</span>
-            <span className="text-white/60"> • </span>
-            <span className="line-clamp-2 sm:line-clamp-1">
-              good service, fast response
-            </span>
-          </div>
+      {/* Card */}
+      <div className="card">
+        <div className="status-pill">
+          <div className="dot" />
+          servers offline
         </div>
-      </div>
 
-      {/* CENTER CONTENT */}
-      <section
-        className={[
-          "flex flex-col items-center text-center max-w-md px-4",
-          "transition-all duration-700 ease-out",
-          "animate-[welcomeIn_700ms_ease-out_forwards]",
-          leaving ? "opacity-0 translate-y-3 scale-[0.99] blur-[2px]" : "",
-        ].join(" ")}
-      >
+        <div className="icon-wrap">🔧</div>
+
         <h1
-          className={[
-            "text-3xl sm:text-4xl md:text-5xl mb-3 tracking-wide text-gray-200",
-            "transition-all duration-500",
-            leaving ? "opacity-0 -translate-y-1" : "opacity-100 translate-y-0",
-          ].join(" ")}
+          style={{
+            fontFamily: "'Syne', sans-serif",
+            fontWeight: 800,
+            fontSize: "clamp(1.65rem, 5vw, 2.4rem)",
+            lineHeight: 1.15,
+            marginBottom: "0.75rem",
+            letterSpacing: "-0.02em",
+          }}
         >
-          welcome
+          We&apos;ll be back{" "}
+          <span style={{ color: "#c084fc" }}>very soon</span>
         </h1>
 
         <p
-          className={[
-            "text-sm sm:text-base text-white/75 mb-6",
-            "transition-all duration-500",
-            leaving ? "opacity-0 -translate-y-1" : "opacity-100 translate-y-0",
-          ].join(" ")}
+          style={{
+            fontSize: "0.95rem",
+            color: "rgba(255,255,255,0.6)",
+            lineHeight: 1.65,
+            maxWidth: 340,
+            marginBottom: "1.6rem",
+          }}
         >
-          We accept PayPal, Apple Pay, debit card & credit card
+          Sorry for the inconvenience — our servers are currently down for
+          maintenance. We&apos;re working on it and will be back shortly.
         </p>
 
-        <button
-          onClick={onContinue}
-          disabled={leaving}
-          className={[
-            "relative group",
-            "bg-gray-200 text-purple-600 px-12 sm:px-16 py-4 rounded-full text-xl sm:text-2xl font-semibold",
-            "transition-all duration-200",
-            "hover:bg-white hover:-translate-y-[1px] hover:shadow-[0_14px_45px_rgba(0,0,0,0.35)]",
-            "active:scale-[0.98]",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black/30",
-            "disabled:opacity-70 disabled:cursor-not-allowed",
-          ].join(" ")}
-        >
-          <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-[0_0_0_6px_rgba(168,85,247,0.15)]" />
-          <span className="relative">{leaving ? "loading..." : "continue"}</span>
-        </button>
-      </section>
+        {/* Uptime counter */}
+        <div className="uptime-label">⏱ down for</div>
+        <div style={{ display: "flex", gap: "0.8rem", marginBottom: "2rem" }}>
+          <div className="time-block">
+            <div className="time-num">{pad(hours)}</div>
+            <div className="time-label">Hours</div>
+          </div>
+          <div className="sep">:</div>
+          <div className="time-block">
+            <div className="time-num">{pad(mins)}</div>
+            <div className="time-label">Mins</div>
+          </div>
+          <div className="sep">:</div>
+          <div className="time-block">
+            <div className="time-num">{pad(secs)}</div>
+            <div className="time-label">Secs</div>
+          </div>
+        </div>
 
-      <style jsx>{`
-        @keyframes welcomeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px) scale(0.99);
-            filter: blur(3px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0px) scale(1);
-            filter: blur(0px);
-          }
-        }
-      `}</style>
+
+      </div>
     </main>
   );
 }
