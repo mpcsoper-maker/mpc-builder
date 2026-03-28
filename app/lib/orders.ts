@@ -9,25 +9,18 @@ export type Order = {
   notes?: string;
   items?: Array<{ label: string; value: string }>;
 
-  // MANUAL PayPal checkout link (one per order)
-  paypalLink: string;
+  paypalLink?: string;
+  stripeLink?: string;
 };
 
 export const ORDERS: Order[] = [
   {
-    slug: "xx-2-17012",
+    slug: "MPC-xx-12",
     customerName: "John",
-    title: "PCXX-2",
+    title: "Custom Gaming PC",
     currency: "USD",
-    price: 1999,
-    notes: "This payment link is for John only.",
-    items: [
-      { label: "CPU", value: "Ryzen 7 7800X3D" },
-      { label: "GPU", value: "RTX 4070 Ti" },
-      { label: "RAM", value: "32GB DDR5" },
-      { label: "Storage", value: "2TB NVMe" },
-    ],
-    paypalLink: "https://www.paypal.com/ncp/payment/MMB3235MM7J72",
+    price: 1499,
+    stripeLink: "https://buy.stripe.com/7sYbJ3ezJfhG6bQguL2wU00",
   },
 ];
 

@@ -7,7 +7,6 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // lets us trigger a clean enter animation after hydration
     const t = window.setTimeout(() => setMounted(true), 20);
     return () => window.clearTimeout(t);
   }, []);
@@ -41,7 +40,7 @@ export default function Home() {
         <div className="text-[4.2rem] sm:text-[5.2rem] md:text-[6.5rem]">
           M-
           <br />
-          pc’s
+          pc's
         </div>
         <div className="h-2 w-28 sm:w-36 md:w-40 bg-purple-400 mt-2" />
       </div>
@@ -80,46 +79,85 @@ export default function Home() {
         </div>
 
         {/* BUTTONS */}
-        <div className="relative z-10 flex flex-col items-center justify-center mt-14 gap-6">
-          <Link
-            href="/pc-make"
-            className={[
-              "relative group w-full max-w-xl",
-              "bg-purple-500 text-indigo-950",
-              "px-10 py-8 rounded-3xl",
-              "text-3xl md:text-4xl font-extrabold",
-              "shadow-2xl shadow-purple-500/25",
-              "transition-all duration-200",
-              "hover:bg-purple-400 hover:-translate-y-[2px] hover:shadow-[0_18px_60px_rgba(0,0,0,0.45)]",
-              "active:translate-y-[0px] active:scale-[0.985]",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black/30",
-            ].join(" ")}
-          >
-            {/* glow ring */}
-            <span className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-[0_0_0_7px_rgba(168,85,247,0.18)]" />
-            <span className="relative">make your own pc</span>
-          </Link>
+        <div className="relative z-10 flex flex-col items-center justify-center mt-14 gap-4">
 
+          {/* PREBUILTS — hero button */}
           <Link
             href="/prebuilts"
             className={[
               "relative group w-full max-w-xl",
-              "bg-white/10 text-white border border-white/15 backdrop-blur-xl",
-              "px-10 py-6 rounded-3xl",
-              "text-2xl md:text-3xl font-semibold",
-              "shadow-lg",
+              "px-10 py-8 rounded-3xl",
+              "text-3xl md:text-4xl font-extrabold text-white",
+              "shadow-2xl",
               "transition-all duration-200",
-              "hover:bg-white/15 hover:-translate-y-[2px] hover:border-white/25 hover:shadow-[0_16px_55px_rgba(0,0,0,0.40)]",
+              "hover:-translate-y-[3px]",
               "active:translate-y-[0px] active:scale-[0.985]",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black/30",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80",
+            ].join(" ")}
+            style={{
+              background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #2563eb 100%)",
+              boxShadow: "0 0 40px rgba(124,58,237,0.5), 0 20px 60px rgba(0,0,0,0.4)",
+            }}
+          >
+            {/* animated shimmer */}
+            <span className="pointer-events-none absolute inset-0 rounded-3xl overflow-hidden">
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)",
+                  transform: "translateX(-100%)",
+                  animation: "shimmer 1.2s ease forwards",
+                }}
+              />
+            </span>
+
+            <span className="relative flex items-center justify-between">
+              <span>
+                pre-builds
+                <span className="block text-sm font-normal text-white/70 mt-1">
+                  ready-to-order
+                </span>
+              </span>
+              <span className="text-4xl">→</span>
+            </span>
+
+            {/* HOT badge */}
+            <span className="absolute -top-3 -right-3 bg-orange-400 text-black text-xs font-black px-3 py-1 rounded-full shadow-lg rotate-3">
+              ⭐ RECOMMENDED
+            </span>
+          </Link>
+
+          {/* divider */}
+          <div className="flex items-center gap-3 w-full max-w-xl text-white/30 text-sm">
+            <div className="flex-1 h-px bg-white/15" />
+            or
+            <div className="flex-1 h-px bg-white/15" />
+          </div>
+
+          {/* CUSTOM — secondary */}
+          <Link
+            href="/pc-make"
+            className={[
+              "relative group w-full max-w-xl",
+              "bg-white/8 text-white/80 border border-white/12 backdrop-blur-xl",
+              "px-10 py-5 rounded-3xl",
+              "text-xl font-semibold",
+              "transition-all duration-200",
+              "hover:bg-white/12 hover:-translate-y-[1px] hover:text-white",
+              "active:translate-y-[0px] active:scale-[0.985]",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80",
             ].join(" ")}
           >
-            <span className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-[0_0_0_7px_rgba(255,255,255,0.10)]" />
-            <span className="relative">pre-build’s</span>
+            <span className="absolute -top-3 -right-3 bg-blue-400 text-black text-xs font-black px-3 py-1 rounded-full shadow-lg rotate-3">
+              🔧 ADVANCED
+            </span>
+            <span className="relative flex items-center justify-between">
+              <span>make your own pc</span>
+              <span className="text-2xl opacity-50 group-hover:opacity-80 transition-opacity">→</span>
+            </span>
           </Link>
         </div>
 
-        {/* little footer text */}
+        {/* footer text */}
         <div
           className={[
             "text-center mt-10 text-sm text-white/60",
@@ -130,6 +168,13 @@ export default function Home() {
           FREE SHIPPING IN GERMANY
         </div>
       </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); opacity: 1; }
+          100% { transform: translateX(100%); opacity: 1; }
+        }
+      `}</style>
     </main>
   );
 }

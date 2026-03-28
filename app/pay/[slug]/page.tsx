@@ -57,7 +57,7 @@ export default async function PayPage({
 
               {order.items?.length ? (
                 <div className="mt-4 grid gap-3">
-                  {order.items.map((it) => (
+                  {order.items.map((it: { label: string; value: string }) => (
                     <div
                       key={it.label}
                       className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-800/70 px-4 py-3"
@@ -92,19 +92,46 @@ export default async function PayPage({
                 <div className="mt-1 text-3xl font-semibold">
                   {money(order.currency, order.price)}
                 </div>
-                <div className="mt-2 text-xs text-zinc-500">
-                  You will be redirected to PayPal to complete payment.
-                </div>
               </div>
 
-              <a
-                href={order.paypalLink}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-5 block w-full rounded-xl bg-[#0070BA] px-4 py-3 text-center font-semibold text-white transition hover:bg-[#005EA6]"
-              >
-                Pay →
-              </a>
+              {/* Payment buttons */}
+              <div className="mt-5 grid gap-3">
+
+                {/* Stripe — shown only if stripeLink is set on the order */}
+                {order.stripeLink && (
+                  <div>
+                    <a
+                      href={order.stripeLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block w-full rounded-xl bg-indigo-600 px-4 py-3 text-center font-semibold text-white transition hover:bg-indigo-500"
+                    >
+                      Pay by Card →
+                    </a>
+                    <p className="mt-1 text-center text-xs text-zinc-500">
+                      Credit / debit card via Stripe · 2.9% + $0.30
+                    </p>
+                  </div>
+                )}
+
+                {/* PayPal */}
+                {order.paypalLink && (
+                  <div>
+                    <a
+                      href={order.paypalLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block w-full rounded-xl bg-[#0070BA] px-4 py-3 text-center font-semibold text-white transition hover:bg-[#005EA6]"
+                    >
+                      Pay with PayPal →
+                    </a>
+                    <p className="mt-1 text-center text-xs text-zinc-500">
+                      PayPal · ~3.49% + $0.49
+                    </p>
+                  </div>
+                )}
+
+              </div>
 
               <p className="mt-4 text-center text-xs text-zinc-500">
                 MPCs • Private payment link
