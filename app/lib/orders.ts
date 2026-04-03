@@ -15,7 +15,7 @@ export type Order = {
 
 export const ORDERS: Order[] = [
   {
-    slug: "MPC-xx-12",
+    slug: "test",
     customerName: "John",
     title: "Custom Gaming PC",
     currency: "USD",
