@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { PREBUILTS } from "../../lib/prebuilts";
-import ContinueToContactButton from "./ContinueToContactButton";
+import ContinueToContactButton from "./ContinueToContactButton2";
 
 function euro(n: number) {
   return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(n);
@@ -98,7 +98,7 @@ export default async function PrebuiltDetailsPage(props: PageProps) {
             <ContinueToContactButton prebuilt={prebuilt} />
 
             <div className="text-white/60 text-sm mt-2">
-              You’ll get a build code + download file to send us on WhatsApp/Discord.
+              
             </div>
           </div>
 
